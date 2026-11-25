@@ -1,32 +1,34 @@
-# React + TypeScript + Vite
+# The Art Archive
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+An interactive vintage digital art book & personal gallery built with React, TypeScript, Tailwind CSS, and Supabase.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Physical Hardcover Book**: Deep forest green leather cover (`#34483A`), gold-embossed typography (`#B69A64`), raised spine, and layered page edges.
+- **3D Page-Turning & Back Cover**: Realistic CSS 3D `rotateY` page flips, touch swipe support on mobile, and a connected closing animation onto the Back Cover when finishing the book.
+- **Dynamic Table of Contents**: Automatically synchronized with inserted, edited, or deleted artworks.
+- **Strict Artwork Preservation**: Original images are stored in Supabase Storage without cropping or compression and rendered with `object-fit: contain`.
+- **Cloud Persistence (Supabase)**:
+  - `public.book_pages` — Tracks Table of Contents, Artwork pages, and Final page order.
+  - `public.artworks` — Stores artwork titles, original dimensions, aspect ratios, and public image URLs.
+  - `artworks` Storage Bucket — Stores the original uploaded artwork files.
 
-## React Compiler
+## Local Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Configure `.env` (see `.env.example`):
+   ```env
+   VITE_SUPABASE_URL=https://fodbcogpenijknjgyjhb.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-publishable-key
+   ```
+3. Start the dev server:
+   ```bash
+   npm run dev
+   ```
 
-## Expanding the Oxlint configuration
+## Database Schema
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The Supabase schema and storage bucket setup are tracked in [supabase/migrations/001_art_archive_schema.sql](supabase/migrations/001_art_archive_schema.sql).
