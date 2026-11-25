@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+:root {
+  --color-parchment: #E8D8B5;
+  --color-ivory: #F5EDDE;
+  --color-aged-paper: #D8C5A3;
+  --color-forest: #34483A;
+  --color-forest-deep: #243329;
+  --color-brown: #795C42;
+  --color-espresso: #35291F;
+  --color-olive: #78836A;
+  --color-gold: #B69A64;
+  --color-gold-light: #D4BC8B;
+  --color-gold-dark: #8A7142;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #211B16;
+    color: var(--color-espresso);
+    font-family: 'EB Garamond', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.font-display {
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+.font-serif-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-serif-body {
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+/* Archival table / studio backdrop (separate from the book) */
+.studio-backdrop {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(72, 57, 45, 0.42) 0%, rgba(33, 26, 21, 0.92) 65%, #16110D 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    #1E1813;
+}
+
+/* Leather cover texture */
+.leather-cover {
+  background-color: #34483A;
+  background-image:
+    radial-gradient(circle at 25% 20%, rgba(255, 245, 220, 0.06) 0%, transparent 55%),
+    radial-gradient(circle at 80% 85%, rgba(0, 0, 0, 0.35) 0%, transparent 60%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.04) 0px,
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+/* Gold embossed text effect */
+.gold-emboss {
+  color: #D2B882;
+  text-shadow:
+    0 1px 0 rgba(255, 244, 214, 0.25),
+    0 -1px 1px rgba(18, 26, 20, 0.85),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+/* Aged paper surface */
+.paper-surface {
+  background-color: #F5EDDE;
+  background-image:
+    radial-gradient(ellipse at center, rgba(245, 237, 222, 0.96) 55%, rgba(216, 197, 163, 0.72) 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(121, 92, 66, 0.018) 0px,
+      rgba(121, 92, 66, 0.018) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+.paper-surface-aged {
+  background-color: #E8D8B5;
+  background-image:
+    radial-gradient(ellipse at center, rgba(232, 216, 181, 0.95) 50%, rgba(204, 182, 142, 0.78) 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(121, 92, 66, 0.022) 0px,
+      rgba(121, 92, 66, 0.022) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+/* Endpaper marbled/archival pattern */
+.endpaper-pattern {
+  background-color: #E8D8B5;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(182, 154, 100, 0.08) 0%, rgba(121, 92, 66, 0.14) 100%),
+    repeating-linear-gradient(
+      30deg,
+      rgba(52, 72, 58, 0.03) 0px,
+      rgba(52, 72, 58, 0.03) 2px,
+      transparent 2px,
+      transparent 12px
+    ),
+    repeating-linear-gradient(
+      -30deg,
+      rgba(182, 154, 100, 0.04) 0px,
+      rgba(182, 154, 100, 0.04) 2px,
+      transparent 2px,
+      transparent 12px
+    );
+}
+
+/* Spine gutter shadows for open book */
+.gutter-left {
+  box-shadow:
+    inset -22px 0 30px -14px rgba(53, 41, 31, 0.24),
+    inset -4px 0 8px -2px rgba(53, 41, 31, 0.18);
+}
+
+.gutter-right {
+  box-shadow:
+    inset 22px 0 30px -14px rgba(53, 41, 31, 0.24),
+    inset 4px 0 8px -2px rgba(53, 41, 31, 0.18);
+}
+
+/* 3D book perspective */
+.book-perspective {
+  perspective: 2400px;
+  perspective-origin: 50% 48%;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Layered page edge stack effect */
+.page-edges-right {
+  background: repeating-linear-gradient(
+    90deg,
+    #F5EDDE 0px,
+    #F5EDDE 2px,
+    #D8C5A3 2px,
+    #D8C5A3 3px
+  );
+}
+
+.page-edges-bottom {
+  background: repeating-linear-gradient(
+    0deg,
+    #F5EDDE 0px,
+    #F5EDDE 2px,
+    #D8C5A3 2px,
+    #D8C5A3 3px
+  );
+}
+
+/* Custom subtle scrollbar for TOC if many artworks */
+.archive-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.archive-scroll::-webkit-scrollbar-track {
+  background: rgba(216, 197, 163, 0.35);
+}
+.archive-scroll::-webkit-scrollbar-thumb {
+  background: rgba(121, 92, 66, 0.45);
+  border-radius: 3px;
+}
+.archive-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(121, 92, 66, 0.7);
+}
