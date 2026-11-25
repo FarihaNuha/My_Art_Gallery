@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArtBook } from './components/ArtBook';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import {
   addNewArtworkPage,
   deleteArtworkFromPage,
@@ -11,11 +12,25 @@ import {
 } from './services/archiveDb';
 import type { Artwork, BookPage, ImageDimensions } from './types/archive';
 
+const ADMIN_SESSION_KEY = 'art_archive_admin_unlocked';
+
 export function App() {
   const [pages, setPages] = useState<BookPage[]>([]);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
+  });
+  const [showAdminModal, setShowAdminModal] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const isUrlAdmin =
+      window.location.hash.includes('admin') ||
+      new URLSearchParams(window.location.search).get('admin') === '1';
+    return isUrlAdmin && sessionStorage.getItem(ADMIN_SESSION_KEY) !== 'true';
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -28,13 +43,23 @@ export function App() {
       })
       .catch((err) => {
         if (!mounted) return;
-        setLoadError(err instanceof Error ? err.message : 'Unable to open local archive.');
+        setLoadError(err instanceof Error ? err.message : 'Unable to open archive.');
         setIsLoading(false);
       });
     return () => {
       mounted = false;
     };
   }, []);
+
+  const handleUnlockAdmin = () => {
+    sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+    setIsAdmin(true);
+  };
+
+  const handleExitAdmin = () => {
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    setIsAdmin(false);
+  };
 
   const handleInsertArtwork = async (
     pageId: string,
@@ -45,7 +70,9 @@ export function App() {
     const { artwork, page } = await insertArtworkOnPage(pageId, title, file, dimensions);
     setPages((prev) => prev.map((p) => (p.id === page.id ? page : p)));
     setArtworks((prev) => {
-      const filtered = prev.filter((a) => a.pageNumber !== artwork.pageNumber && a.id !== artwork.id);
+      const filtered = prev.filter(
+        (a) => a.pageNumber !== artwork.pageNumber && a.id !== artwork.id
+      );
       return [...filtered, artwork].sort((a, b) => a.pageNumber - b.pageNumber);
     });
   };
@@ -84,13 +111,13 @@ export function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full studio-backdrop flex items-center justify-center">
+      <div className="min-h-[100dvh] w-full studio-backdrop flex items-center justify-center">
         <div className="text-center space-y-2">
           <p className="font-display text-sm tracking-[0.26em] uppercase text-[#B69A64]">
             The Art Archive
           </p>
           <p className="font-serif-title italic text-base text-[#D8C5A3]/75">
-            Preparing archival volume...
+            Opening archival volume...
           </p>
         </div>
       </div>
@@ -99,7 +126,7 @@ export function App() {
 
   if (loadError) {
     return (
-      <div className="min-h-screen w-full studio-backdrop flex items-center justify-center p-6">
+      <div className="min-h-[100dvh] w-full studio-backdrop flex items-center justify-center p-6">
         <div className="max-w-md paper-surface border border-[#B69A64] p-6 text-center">
           <h1 className="font-display text-base tracking-[0.16em] uppercase text-[#35291F] mb-2">
             Archive Unavailable
@@ -111,16 +138,27 @@ export function App() {
   }
 
   return (
-    <ArtBook
-      pages={pages}
-      artworks={artworks}
-      onInsertArtwork={handleInsertArtwork}
-      onUpdateTitle={handleUpdateTitle}
-      onReplaceImage={handleReplaceImage}
-      onDeleteArtwork={handleDeleteArtwork}
-      onAddPage={handleAddPage}
-      onRemoveEmptyPage={handleRemoveEmptyPage}
-    />
+    <>
+      <ArtBook
+        pages={pages}
+        artworks={artworks}
+        isAdmin={isAdmin}
+        onRequestAdmin={() => setShowAdminModal(true)}
+        onExitAdmin={handleExitAdmin}
+        onInsertArtwork={handleInsertArtwork}
+        onUpdateTitle={handleUpdateTitle}
+        onReplaceImage={handleReplaceImage}
+        onDeleteArtwork={handleDeleteArtwork}
+        onAddPage={handleAddPage}
+        onRemoveEmptyPage={handleRemoveEmptyPage}
+      />
+
+      <AdminLoginModal
+        isOpen={showAdminModal}
+        onClose={() => setShowAdminModal(false)}
+        onSuccess={handleUnlockAdmin}
+      />
+    </>
   );
 }
 
