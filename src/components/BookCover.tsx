@@ -56,59 +56,59 @@ export const BookCover: React.FC<BookCoverProps> = ({
         }}
       >
         {/* Left raised leather spine */}
-        <BookSpine className="w-7 sm:w-9 shrink-0 border-r border-[#1B261E]" />
+        <BookSpine className="w-3.5 sm:w-9 shrink-0 border-r border-[#1B261E]" />
 
         {/* Main front cover face */}
-        <div className="relative flex-1 p-5 sm:p-8 flex flex-col justify-between">
+        <div className="relative flex-1 p-2 sm:p-8 flex flex-col justify-between">
           {/* Outer embossed gold frame */}
           <div
             className="
-              relative flex-1 rounded-sm p-4 sm:p-7 flex flex-col items-center justify-between
+              relative flex-1 rounded-sm p-2 sm:p-7 flex flex-col items-center justify-between
               border border-[#B69A64]/70
             "
             style={{
               boxShadow:
-                'inset 0 0 0 4px rgba(52,72,58,0.9), inset 0 0 0 5px rgba(182,154,100,0.45), 0 1px 2px rgba(0,0,0,0.45)',
+                'inset 0 0 0 2px rgba(52,72,58,0.9), inset 0 0 0 3px rgba(182,154,100,0.45), 0 1px 2px rgba(0,0,0,0.45)',
             }}
           >
             {/* Ornamental corners */}
-            <CornerOrnament position="top-left" size={42} className="absolute top-2 left-2 opacity-90" />
-            <CornerOrnament position="top-right" size={42} className="absolute top-2 right-2 opacity-90" />
-            <CornerOrnament position="bottom-left" size={42} className="absolute bottom-2 left-2 opacity-90" />
-            <CornerOrnament position="bottom-right" size={42} className="absolute bottom-2 right-2 opacity-90" />
+            <CornerOrnament position="top-left" size={42} className="absolute top-1 left-1 sm:top-2 sm:left-2 w-5 h-5 sm:w-[42px] sm:h-[42px] opacity-90" />
+            <CornerOrnament position="top-right" size={42} className="absolute top-1 right-1 sm:top-2 sm:right-2 w-5 h-5 sm:w-[42px] sm:h-[42px] opacity-90" />
+            <CornerOrnament position="bottom-left" size={42} className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 w-5 h-5 sm:w-[42px] sm:h-[42px] opacity-90" />
+            <CornerOrnament position="bottom-right" size={42} className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-5 h-5 sm:w-[42px] sm:h-[42px] opacity-90" />
 
             {/* Top archival crest / divider */}
-            <div className="mt-4 sm:mt-6 flex flex-col items-center gap-2">
-              <div className="flex items-center gap-3">
-                <span className="h-[1px] w-8 sm:w-12 bg-[#B69A64]/65" />
-                <span className="text-[10px] sm:text-xs tracking-[0.32em] uppercase font-display text-[#B69A64]/90">
+            <div className="mt-1.5 sm:mt-6 flex flex-col items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-3">
+                <span className="h-[1px] w-3 sm:w-12 bg-[#B69A64]/65" />
+                <span className="text-[7px] sm:text-xs tracking-[0.2em] sm:tracking-[0.32em] uppercase font-display text-[#B69A64]/90">
                   Archival Edition
                 </span>
-                <span className="h-[1px] w-8 sm:w-12 bg-[#B69A64]/65" />
+                <span className="h-[1px] w-3 sm:w-12 bg-[#B69A64]/65" />
               </div>
             </div>
 
             {/* Central Gold-Embossed Title Plaque */}
-            <div className="my-auto text-center px-2 sm:px-3 py-4 sm:py-8 relative">
+            <div className="my-auto text-center px-1 sm:px-3 py-1 sm:py-8 relative">
               <div
-                className="w-14 sm:w-16 h-[1px] mx-auto mb-3.5 sm:mb-5 bg-gradient-to-r from-transparent via-[#B69A64] to-transparent"
+                className="w-8 sm:w-16 h-[1px] mx-auto mb-2 sm:mb-5 bg-gradient-to-r from-transparent via-[#B69A64] to-transparent"
               />
-              <h1 className="font-display text-2xl sm:text-4xl md:text-[2.6rem] font-semibold tracking-[0.14em] leading-tight gold-emboss">
+              <h1 className="font-display text-sm sm:text-4xl md:text-[2.6rem] font-semibold tracking-[0.12em] sm:tracking-[0.14em] leading-tight gold-emboss">
                 THE ART
                 <br />
                 ARCHIVE
               </h1>
-              <div className="my-3 sm:my-4 flex items-center justify-center gap-2">
-                <span className="h-[1px] w-8 sm:w-10 bg-[#B69A64]/50" />
-                <span className="w-1.5 h-1.5 rotate-45 border border-[#B69A64]" />
-                <span className="h-[1px] w-8 sm:w-10 bg-[#B69A64]/50" />
+              <div className="my-1.5 sm:my-4 flex items-center justify-center gap-1.5 sm:gap-2">
+                <span className="h-[1px] w-4 sm:w-10 bg-[#B69A64]/50" />
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rotate-45 border border-[#B69A64]" />
+                <span className="h-[1px] w-4 sm:w-10 bg-[#B69A64]/50" />
               </div>
-              <p className="font-serif-title italic text-sm sm:text-xl tracking-wide text-[#D8C5A3]/90">
+              <p className="font-serif-title italic text-[10px] sm:text-xl tracking-wide text-[#D8C5A3]/90 leading-tight">
                 A Collection of Creative Expressions
               </p>
 
               {/* Open Book CTA Button */}
-              <div className="mt-5 sm:mt-9 flex justify-center">
+              <div className="mt-3 sm:mt-9 flex justify-center">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -116,29 +116,29 @@ export const BookCover: React.FC<BookCoverProps> = ({
                     onOpen();
                   }}
                   className="
-                    inline-flex items-center gap-2.5 px-6 py-2.5 rounded-sm
+                    inline-flex items-center gap-1.5 sm:gap-2.5 px-2.5 py-1.5 sm:px-6 sm:py-2.5 rounded-sm
                     border border-[#B69A64]/80 bg-[#26362B]/85
-                    text-[#E8D8B5] font-display text-xs sm:text-sm tracking-[0.22em] uppercase
+                    text-[#E8D8B5] font-display text-[8px] sm:text-sm tracking-[0.14em] sm:tracking-[0.22em] uppercase
                     shadow-[0_4px_14px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(212,188,139,0.25)]
                     transition-all duration-300
                     group-hover:bg-[#2F4335] group-hover:border-[#D4BC8B] group-hover:text-[#F5EDDE]
                     hover:scale-[1.02] active:scale-[0.99] cursor-pointer
                   "
                 >
-                  <BookOpen className="w-4 h-4 text-[#B69A64]" />
-                  <span>Open The Book</span>
+                  <BookOpen className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-[#B69A64]" />
+                  <span>Open Book</span>
                 </button>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="mb-3 sm:mb-4 flex flex-col items-center gap-1.5">
+            <div className="mb-1 sm:mb-4 flex flex-col items-center gap-0.5 sm:gap-1.5">
               {artworkCount > 0 && (
-                <span className="font-serif-body text-xs tracking-[0.18em] uppercase text-[#B69A64]/75">
-                  {artworkCount} {artworkCount === 1 ? 'Preserved Work' : 'Preserved Works'}
+                <span className="font-serif-body text-[8px] sm:text-xs tracking-[0.14em] sm:tracking-[0.18em] uppercase text-[#B69A64]/75">
+                  {artworkCount} {artworkCount === 1 ? 'Work' : 'Works'}
                 </span>
               )}
-              <span className="font-display text-[11px] sm:text-xs tracking-[0.35em] text-[#B69A64]/85">
+              <span className="font-display text-[7px] sm:text-xs tracking-[0.26em] sm:tracking-[0.35em] text-[#B69A64]/85">
                 EST. 2026
               </span>
             </div>
@@ -150,7 +150,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
       <div
         className="
           absolute inset-0 backface-hidden rounded-l-xl rounded-r-[4px]
-          leather-cover p-3 sm:p-4 flex
+          leather-cover p-1.5 sm:p-4 flex
           border-y-2 border-l-2 border-[#233127]
         "
         style={{
@@ -158,27 +158,27 @@ export const BookCover: React.FC<BookCoverProps> = ({
           boxShadow: 'inset -12px 0 24px rgba(0,0,0,0.35)',
         }}
       >
-        <div className="w-full h-full endpaper-pattern rounded-l-md border border-[#B69A64]/45 p-5 sm:p-8 flex flex-col items-center justify-between text-center gutter-left">
-          <div className="w-full flex justify-between items-center text-[10px] tracking-[0.25em] uppercase font-display text-[#795C42]/70">
+        <div className="w-full h-full endpaper-pattern rounded-l-md border border-[#B69A64]/45 p-2.5 sm:p-8 flex flex-col items-center justify-between text-center gutter-left">
+          <div className="w-full flex justify-between items-center text-[6px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.25em] uppercase font-display text-[#795C42]/70">
             <span>Ex Libris</span>
             <span>Archival Folio</span>
           </div>
 
-          <div className="my-auto max-w-xs border border-[#B69A64]/60 bg-[#F5EDDE]/75 px-6 py-8 shadow-sm">
-            <p className="font-display text-[11px] tracking-[0.28em] uppercase text-[#795C42] mb-2">
+          <div className="my-auto max-w-xs border border-[#B69A64]/60 bg-[#F5EDDE]/75 px-2.5 py-3 sm:px-6 sm:py-8 shadow-sm">
+            <p className="font-display text-[7px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.28em] uppercase text-[#795C42] mb-1 sm:mb-2">
               Personal Collection
             </p>
-            <h2 className="font-serif-title text-2xl sm:text-3xl font-semibold text-[#35291F] tracking-wide">
+            <h2 className="font-serif-title text-sm sm:text-3xl font-semibold text-[#35291F] tracking-wide">
               The Art Archive
             </h2>
-            <div className="w-12 h-[1px] bg-[#B69A64] mx-auto my-3" />
-            <p className="font-serif-body italic text-sm sm:text-base text-[#795C42] leading-relaxed">
-              Every page is reserved for an original work, preserved in its true proportion and form.
+            <div className="w-8 sm:w-12 h-[1px] bg-[#B69A64] mx-auto my-1.5 sm:my-3" />
+            <p className="font-serif-body italic text-[9px] sm:text-base text-[#795C42] leading-snug sm:leading-relaxed">
+              Every page preserves an original work in its true proportion and form.
             </p>
           </div>
 
-          <div className="text-[11px] font-serif-body italic text-[#795C42]/75">
-            Bound in Forest Leather &amp; Archival Parchment
+          <div className="text-[7px] sm:text-[11px] font-serif-body italic text-[#795C42]/75">
+            Bound in Forest Leather &amp; Parchment
           </div>
         </div>
       </div>
