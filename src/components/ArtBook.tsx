@@ -11,8 +11,17 @@ import {
   Lock,
   Eye,
   ShieldCheck,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import type { Artwork, BookPage, ImageDimensions, TocEntry } from '../types/archive';
+import {
+  setVoiceEnabled,
+  speakBookClosingEnd,
+  speakBookClosingFront,
+  speakBookOpening,
+  speakSpreadArtworks,
+} from '../services/voiceNarrator';
 import { BookCover } from './BookCover';
 import { BookSpine } from './BookSpine';
 import { CornerOrnament } from './CornerOrnament';
@@ -69,6 +78,7 @@ export const ArtBook: React.FC<ArtBookProps> = ({
   const [currentSpread, setCurrentSpread] = useState(0);
   const [flippingSheetIndex, setFlippingSheetIndex] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isVoiceOn, setIsVoiceOn] = useState(true);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -168,6 +178,37 @@ export const ArtBook: React.FC<ArtBookProps> = ({
     animationTimersRef.current.push(t);
   }, []);
 
+  const announceSpreadArtworks = useCallback(
+    (spreadIdx: number) => {
+      if (spreadIdx <= 0) return;
+      const leftPage = pages[spreadIdx * 2 - 1];
+      const rightPage = pages[spreadIdx * 2];
+
+      const leftArt =
+        leftPage?.pageType === 'artwork' && leftPage.artworkId
+          ? artworkById.get(leftPage.artworkId)
+          : undefined;
+      const rightArt =
+        rightPage?.pageType === 'artwork' && rightPage.artworkId
+          ? artworkById.get(rightPage.artworkId)
+          : undefined;
+
+      speakSpreadArtworks(
+        leftArt ? { title: leftArt.title, pageNumber: leftPage.pageNumber } : undefined,
+        rightArt ? { title: rightArt.title, pageNumber: rightPage.pageNumber } : undefined
+      );
+    },
+    [pages, artworkById]
+  );
+
+  const toggleVoice = useCallback(() => {
+    setIsVoiceOn((prev) => {
+      const next = !prev;
+      setVoiceEnabled(next);
+      return next;
+    });
+  }, []);
+
   const handleOpenBook = useCallback(() => {
     if (isOpen && !isClosing) return;
     clearTimers();
@@ -175,12 +216,14 @@ export const ArtBook: React.FC<ArtBookProps> = ({
     setClosedSide('front');
     setCurrentSpread(0);
     setIsOpen(true);
+    speakBookOpening();
   }, [isOpen, isClosing, clearTimers]);
 
   const handleCloseToFront = useCallback(() => {
     if (!isOpen || isClosing) return;
     clearTimers();
     setIsClosing(true);
+    speakBookClosingFront();
 
     const stepsToClose = currentSpread;
     if (stepsToClose === 0) {
@@ -216,6 +259,7 @@ export const ArtBook: React.FC<ArtBookProps> = ({
     if (!isOpen || isClosing) return;
     clearTimers();
     setIsClosing(true);
+    speakBookClosingEnd();
 
     const remainingSheets = sheets.length - currentSpread;
     for (let step = 1; step <= remainingSheets; step++) {
@@ -243,7 +287,8 @@ export const ArtBook: React.FC<ArtBookProps> = ({
     setClosedSide('front');
     setCurrentSpread(maxSpread);
     setIsOpen(true);
-  }, [isOpen, isClosing, maxSpread, clearTimers]);
+    announceSpreadArtworks(maxSpread);
+  }, [isOpen, isClosing, maxSpread, clearTimers, announceSpreadArtworks]);
 
   const handleFlipToFrontCover = useCallback(() => {
     if (isOpen || isClosing) return;
@@ -270,11 +315,14 @@ export const ArtBook: React.FC<ArtBookProps> = ({
             triggerSheetFlip(direction > 0 ? prev : next);
             return next;
           });
+          if (step === distance) {
+            announceSpreadArtworks(targetSpread);
+          }
         }, (step - 1) * 150);
         animationTimersRef.current.push(t);
       }
     },
-    [isOpen, maxSpread, currentSpread, clearTimers, triggerSheetFlip]
+    [isOpen, maxSpread, currentSpread, clearTimers, triggerSheetFlip, announceSpreadArtworks]
   );
 
   const handleNextPage = useCallback(() => {
@@ -284,9 +332,11 @@ export const ArtBook: React.FC<ArtBookProps> = ({
       handleCloseToBack();
       return;
     }
+    const nextSpread = currentSpread + 1;
     triggerSheetFlip(currentSpread);
-    setCurrentSpread((prev) => prev + 1);
-  }, [isOpen, isClosing, currentSpread, maxSpread, handleCloseToBack, triggerSheetFlip]);
+    setCurrentSpread(nextSpread);
+    announceSpreadArtworks(nextSpread);
+  }, [isOpen, isClosing, currentSpread, maxSpread, handleCloseToBack, triggerSheetFlip, announceSpreadArtworks]);
 
   const handlePrevPage = useCallback(() => {
     if (!isOpen || isClosing) return;
@@ -295,9 +345,11 @@ export const ArtBook: React.FC<ArtBookProps> = ({
       handleCloseToFront();
       return;
     }
-    triggerSheetFlip(currentSpread - 1);
-    setCurrentSpread((prev) => prev - 1);
-  }, [isOpen, isClosing, currentSpread, handleCloseToFront, triggerSheetFlip]);
+    const prevSpread = currentSpread - 1;
+    triggerSheetFlip(prevSpread);
+    setCurrentSpread(prevSpread);
+    announceSpreadArtworks(prevSpread);
+  }, [isOpen, isClosing, currentSpread, handleCloseToFront, triggerSheetFlip, announceSpreadArtworks]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -544,6 +596,20 @@ export const ArtBook: React.FC<ArtBookProps> = ({
               <span>Admin</span>
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={toggleVoice}
+            className="p-1 text-[#D8C5A3]/80 hover:text-[#F5EDDE] transition-colors cursor-pointer"
+            title={isVoiceOn ? 'Mute voice narration' : 'Enable voice narration'}
+            aria-label={isVoiceOn ? 'Mute voice narration' : 'Enable voice narration'}
+          >
+            {isVoiceOn ? (
+              <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B69A64]" />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D8C5A3]/50" />
+            )}
+          </button>
 
           {isOpen && !isClosing && (
             <button

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Check, ImagePlus, Pencil, RefreshCw, Trash2, X } from 'lucide-react';
+import { Check, ImagePlus, Pencil, RefreshCw, Trash2, Volume2, X } from 'lucide-react';
 import type { Artwork, BookPage } from '../types/archive';
+import { speakArtworkTitle } from '../services/voiceNarrator';
 
 interface ArtworkPageProps {
   page: BookPage;
@@ -252,9 +253,20 @@ export const ArtworkPage: React.FC<ArtworkPageProps> = ({
             </form>
           ) : (
             <div className="text-center mb-0.5 sm:mb-1.5">
-              <h3 className="font-serif-title text-[11px] sm:text-xl font-semibold text-[#35291F] tracking-wide truncate px-1 sm:px-2">
-                {artwork.title}
-              </h3>
+              <div className="inline-flex items-center justify-center gap-1 sm:gap-1.5 max-w-full px-1 sm:px-2">
+                <h3 className="font-serif-title text-[11px] sm:text-xl font-semibold text-[#35291F] tracking-wide truncate">
+                  {artwork.title}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => speakArtworkTitle(artwork.title, page.pageNumber)}
+                  title="Listen to artwork title"
+                  aria-label={`Listen to ${artwork.title}`}
+                  className="p-0.5 sm:p-1 rounded-full text-[#795C42]/80 hover:text-[#34483A] hover:bg-[#D8C5A3]/45 transition-colors cursor-pointer shrink-0"
+                >
+                  <Volume2 className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                </button>
+              </div>
               <p className="hidden sm:block font-serif-body text-[11px] text-[#795C42]/75">
                 {artwork.originalWidth} &times; {artwork.originalHeight} px
               </p>
