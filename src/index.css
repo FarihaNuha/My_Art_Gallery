@@ -204,6 +204,12 @@
 }
 
 /* Anti-capture & anti-save protections */
+.studio-backdrop {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .protected-artwork-img {
   -webkit-user-drag: none;
   user-select: none;

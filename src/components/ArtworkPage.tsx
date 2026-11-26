@@ -144,12 +144,23 @@ export const ArtworkPage: React.FC<ArtworkPageProps> = ({
               onContextMenu={(e) => e.preventDefault()}
               className="max-w-full max-h-full w-auto h-auto object-contain block shadow-[0_4px_16px_rgba(53,41,31,0.22)] protected-artwork-img"
             />
-            {/* Transparent protective layer to prevent right-click/long-press image saving */}
+            {/* Transparent protective layer + subtle archival watermark in Public View */}
             <div
-              className="absolute inset-0 z-10"
+              className="absolute inset-0 z-10 overflow-hidden flex items-center justify-center pointer-events-auto"
               onContextMenu={(e) => e.preventDefault()}
               aria-hidden="true"
-            />
+            >
+              {!isAdmin && (
+                <div className="-rotate-24 flex flex-col items-center gap-3 sm:gap-6 opacity-[0.14] select-none pointer-events-none">
+                  <span className="font-display text-[8px] sm:text-xs tracking-[0.28em] uppercase text-[#35291F] whitespace-nowrap">
+                    The Art Archive &middot; Protected
+                  </span>
+                  <span className="font-display text-[8px] sm:text-xs tracking-[0.28em] uppercase text-[#35291F] whitespace-nowrap">
+                    Do Not Copy &middot; Original Work
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         ) : isAdmin ? (
           <div className="w-full h-full flex flex-col items-center justify-center p-2 sm:p-6 border border-dashed border-[#B69A64]/70 bg-[#E8D8B5]/25 rounded-[2px] text-center">

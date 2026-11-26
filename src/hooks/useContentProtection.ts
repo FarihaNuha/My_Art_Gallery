@@ -94,12 +94,19 @@ export function useContentProtection(enabled: boolean) {
       }
     };
 
+    const onPageHide = () => {
+      setShieldReason('Archive veiled while inactive to protect artwork.');
+      setIsShieldActive(true);
+    };
+
     document.addEventListener('contextmenu', onContextMenu);
     document.addEventListener('dragstart', onDragStart);
     document.addEventListener('copy', onCopy);
     window.addEventListener('keydown', onKeyDown, true);
     window.addEventListener('keyup', onKeyUp, true);
     document.addEventListener('visibilitychange', onVisibilityChange);
+    document.addEventListener('freeze', onPageHide);
+    window.addEventListener('pagehide', onPageHide);
     window.addEventListener('blur', onBlur);
     window.addEventListener('focus', onFocus);
 
@@ -113,6 +120,8 @@ export function useContentProtection(enabled: boolean) {
       window.removeEventListener('keydown', onKeyDown, true);
       window.removeEventListener('keyup', onKeyUp, true);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.removeEventListener('freeze', onPageHide);
+      window.removeEventListener('pagehide', onPageHide);
       window.removeEventListener('blur', onBlur);
       window.removeEventListener('focus', onFocus);
     };
