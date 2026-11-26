@@ -136,11 +136,19 @@ export const ArtworkPage: React.FC<ArtworkPageProps> = ({
       {/* Main Artwork Display Area (Strict Original Aspect Ratio Preservation) */}
       <div className="flex-1 min-h-0 my-1.5 sm:my-4 flex items-center justify-center relative">
         {artwork && imageUrl ? (
-          <div className="w-full h-full flex items-center justify-center p-1 sm:p-3 bg-[#E8D8B5]/45 border border-[#B69A64]/45 rounded-[2px] shadow-[inset_0_1px_6px_rgba(53,41,31,0.12)]">
+          <div className="relative w-full h-full flex items-center justify-center p-1 sm:p-3 bg-[#E8D8B5]/45 border border-[#B69A64]/45 rounded-[2px] shadow-[inset_0_1px_6px_rgba(53,41,31,0.12)]">
             <img
               src={imageUrl}
               alt={artwork.title}
-              className="max-w-full max-h-full w-auto h-auto object-contain block shadow-[0_4px_16px_rgba(53,41,31,0.22)]"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+              className="max-w-full max-h-full w-auto h-auto object-contain block shadow-[0_4px_16px_rgba(53,41,31,0.22)] protected-artwork-img"
+            />
+            {/* Transparent protective layer to prevent right-click/long-press image saving */}
+            <div
+              className="absolute inset-0 z-10"
+              onContextMenu={(e) => e.preventDefault()}
+              aria-hidden="true"
             />
           </div>
         ) : isAdmin ? (

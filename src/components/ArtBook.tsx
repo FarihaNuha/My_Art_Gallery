@@ -22,6 +22,7 @@ import {
   speakBookOpening,
   speakSpreadArtworks,
 } from '../services/voiceNarrator';
+import { useContentProtection } from '../hooks/useContentProtection';
 import { BookCover } from './BookCover';
 import { BookSpine } from './BookSpine';
 import { CornerOrnament } from './CornerOrnament';
@@ -79,6 +80,7 @@ export const ArtBook: React.FC<ArtBookProps> = ({
   const [flippingSheetIndex, setFlippingSheetIndex] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isVoiceOn, setIsVoiceOn] = useState(true);
+  const { isShieldActive, shieldReason } = useContentProtection(!isAdmin);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -983,6 +985,22 @@ export const ArtBook: React.FC<ArtBookProps> = ({
             <Eye className="w-3 h-3 text-[#B69A64]/70" />
             <span>Reader Edition &middot; Tap cover to open</span>
           </span>
+        </div>
+      )}
+
+      {/* Privacy / Anti-Capture Veil (Public Reader View) */}
+      {isShieldActive && (
+        <div
+          className="fixed inset-0 z-[200] bg-[#16110D]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center select-none"
+          aria-live="assertive"
+        >
+          <Lock className="w-8 h-8 text-[#B69A64] mb-3" />
+          <p className="font-display text-sm sm:text-base tracking-[0.2em] uppercase text-[#E8D8B5] mb-2">
+            The Art Archive &middot; Protected
+          </p>
+          <p className="font-serif-title italic text-base sm:text-lg text-[#D8C5A3]/85 max-w-sm">
+            {shieldReason}
+          </p>
         </div>
       )}
 

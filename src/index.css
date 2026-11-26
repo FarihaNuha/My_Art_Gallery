@@ -202,3 +202,20 @@
 .archive-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(121, 92, 66, 0.7);
 }
+
+/* Anti-capture & anti-save protections */
+.protected-artwork-img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    display: none !important;
+  }
+}
