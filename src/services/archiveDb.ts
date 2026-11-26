@@ -1,5 +1,12 @@
 import type { Artwork, BookPage, ImageDimensions, PageType } from '../types/archive';
-import { ARTWORKS_BUCKET, supabase } from './supabaseClient';
+import { ARTWORKS_BUCKET, supabase, supabaseConfigError } from './supabaseClient';
+
+function getClient() {
+  if (!supabase || supabaseConfigError) {
+    throw new Error(supabaseConfigError ?? 'Supabase client is not configured.');
+  }
+  return supabase;
+}
 
 interface DbArtworkRow {
   id: string;
@@ -77,10 +84,11 @@ export async function readImageDimensions(file: Blob): Promise<ImageDimensions> 
 }
 
 async function uploadOriginalImage(file: File, artworkId: string): Promise<{ storagePath: string; imageUrl: string }> {
+  const client = getClient();
   const safeName = sanitizeFileName(file.name);
   const storagePath = `${artworkId}/${Date.now()}_${safeName}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await client.storage
     .from(ARTWORKS_BUCKET)
     .upload(storagePath, file, {
       cacheControl: '31536000',
@@ -92,7 +100,7 @@ async function uploadOriginalImage(file: File, artworkId: string): Promise<{ sto
     throw new Error(`Image upload failed: ${uploadError.message}`);
   }
 
-  const { data } = supabase.storage.from(ARTWORKS_BUCKET).getPublicUrl(storagePath);
+  const { data } = client.storage.from(ARTWORKS_BUCKET).getPublicUrl(storagePath);
   return {
     storagePath,
     imageUrl: data.publicUrl,
@@ -100,9 +108,10 @@ async function uploadOriginalImage(file: File, artworkId: string): Promise<{ sto
 }
 
 export async function loadArchiveData(): Promise<{ pages: BookPage[]; artworks: Artwork[] }> {
+  const client = getClient();
   const [pagesRes, artworksRes] = await Promise.all([
-    supabase.from('book_pages').select('*').order('page_number', { ascending: true }),
-    supabase.from('artworks').select('*').order('page_number', { ascending: true }),
+    client.from('book_pages').select('*').order('page_number', { ascending: true }),
+    client.from('artworks').select('*').order('page_number', { ascending: true }),
   ]);
 
   if (pagesRes.error) {
@@ -124,7 +133,8 @@ export async function insertArtworkOnPage(
   file: File,
   dimensions: ImageDimensions
 ): Promise<{ artwork: Artwork; page: BookPage }> {
-  const { data: pageData, error: pageError } = await supabase
+  const client = getClient();
+  const { data: pageData, error: pageError } = await client
     .from('book_pages')
     .select('*')
     .eq('id', pageId)
@@ -141,16 +151,16 @@ export async function insertArtworkOnPage(
 
   // If replacing an existing artwork on this page, clean up the old one
   if (pageRow.artwork_id) {
-    const { data: oldArt } = await supabase
+    const { data: oldArt } = await client
       .from('artworks')
       .select('storage_path')
       .eq('id', pageRow.artwork_id)
       .single();
 
     if (oldArt?.storage_path) {
-      await supabase.storage.from(ARTWORKS_BUCKET).remove([oldArt.storage_path]);
+      await client.storage.from(ARTWORKS_BUCKET).remove([oldArt.storage_path]);
     }
-    await supabase.from('artworks').delete().eq('id', pageRow.artwork_id);
+    await client.from('artworks').delete().eq('id', pageRow.artwork_id);
   }
 
   const artworkId = createId('art');
@@ -171,13 +181,13 @@ export async function insertArtworkOnPage(
     updated_at: now,
   };
 
-  const { error: insertError } = await supabase.from('artworks').insert(newArtworkRow);
+  const { error: insertError } = await client.from('artworks').insert(newArtworkRow);
   if (insertError) {
-    await supabase.storage.from(ARTWORKS_BUCKET).remove([storagePath]);
+    await client.storage.from(ARTWORKS_BUCKET).remove([storagePath]);
     throw new Error(`Failed to save artwork metadata: ${insertError.message}`);
   }
 
-  const { data: updatedPageData, error: updatePageError } = await supabase
+  const { data: updatedPageData, error: updatePageError } = await client
     .from('book_pages')
     .update({ artwork_id: artworkId })
     .eq('id', pageId)
@@ -195,7 +205,8 @@ export async function insertArtworkOnPage(
 }
 
 export async function updateArtworkTitle(artworkId: string, newTitle: string): Promise<Artwork> {
-  const { data, error } = await supabase
+  const client = getClient();
+  const { data, error } = await client
     .from('artworks')
     .update({ title: newTitle.trim(), updated_at: Date.now() })
     .eq('id', artworkId)
@@ -214,7 +225,8 @@ export async function replaceArtworkImage(
   file: File,
   dimensions: ImageDimensions
 ): Promise<Artwork> {
-  const { data: existingData, error: fetchError } = await supabase
+  const client = getClient();
+  const { data: existingData, error: fetchError } = await client
     .from('artworks')
     .select('*')
     .eq('id', artworkId)
@@ -227,7 +239,7 @@ export async function replaceArtworkImage(
   const existing = existingData as DbArtworkRow;
   const { storagePath, imageUrl } = await uploadOriginalImage(file, artworkId);
 
-  const { data: updatedData, error: updateError } = await supabase
+  const { data: updatedData, error: updateError } = await client
     .from('artworks')
     .update({
       storage_path: storagePath,
@@ -243,12 +255,12 @@ export async function replaceArtworkImage(
     .single();
 
   if (updateError || !updatedData) {
-    await supabase.storage.from(ARTWORKS_BUCKET).remove([storagePath]);
+    await client.storage.from(ARTWORKS_BUCKET).remove([storagePath]);
     throw new Error(`Failed to replace artwork image: ${updateError?.message ?? 'Unknown error'}`);
   }
 
   if (existing.storage_path) {
-    await supabase.storage.from(ARTWORKS_BUCKET).remove([existing.storage_path]);
+    await client.storage.from(ARTWORKS_BUCKET).remove([existing.storage_path]);
   }
 
   return mapArtworkRow(updatedData as DbArtworkRow);
@@ -257,7 +269,8 @@ export async function replaceArtworkImage(
 export async function deleteArtworkFromPage(
   pageId: string
 ): Promise<{ pages: BookPage[]; artworks: Artwork[] }> {
-  const { data: pageData, error: pageError } = await supabase
+  const client = getClient();
+  const { data: pageData, error: pageError } = await client
     .from('book_pages')
     .select('*')
     .eq('id', pageId)
@@ -270,7 +283,7 @@ export async function deleteArtworkFromPage(
   const pageRow = pageData as DbPageRow;
   const artworkId = pageRow.artwork_id;
 
-  const { error: clearError } = await supabase
+  const { error: clearError } = await client
     .from('book_pages')
     .update({ artwork_id: null })
     .eq('id', pageId);
@@ -280,23 +293,24 @@ export async function deleteArtworkFromPage(
   }
 
   if (artworkId) {
-    const { data: artData } = await supabase
+    const { data: artData } = await client
       .from('artworks')
       .select('storage_path')
       .eq('id', artworkId)
       .single();
 
     if (artData?.storage_path) {
-      await supabase.storage.from(ARTWORKS_BUCKET).remove([artData.storage_path]);
+      await client.storage.from(ARTWORKS_BUCKET).remove([artData.storage_path]);
     }
-    await supabase.from('artworks').delete().eq('id', artworkId);
+    await client.from('artworks').delete().eq('id', artworkId);
   }
 
   return loadArchiveData();
 }
 
 export async function addNewArtworkPage(): Promise<{ pages: BookPage[]; newPageNumber: number }> {
-  const { data: allPagesData, error: fetchError } = await supabase
+  const client = getClient();
+  const { data: allPagesData, error: fetchError } = await client
     .from('book_pages')
     .select('*')
     .order('page_number', { ascending: true });
@@ -310,7 +324,7 @@ export async function addNewArtworkPage(): Promise<{ pages: BookPage[]; newPageN
   const insertedPageNumber = finalPage ? finalPage.page_number : allPages.length + 1;
 
   if (finalPage) {
-    const { error: shiftError } = await supabase
+    const { error: shiftError } = await client
       .from('book_pages')
       .update({ page_number: insertedPageNumber + 1 })
       .eq('id', finalPage.id);
@@ -327,7 +341,7 @@ export async function addNewArtworkPage(): Promise<{ pages: BookPage[]; newPageN
     artwork_id: null,
   };
 
-  const { error: insertError } = await supabase.from('book_pages').insert(newPage);
+  const { error: insertError } = await client.from('book_pages').insert(newPage);
   if (insertError) {
     throw new Error(`Failed to add new page: ${insertError.message}`);
   }
@@ -339,7 +353,8 @@ export async function addNewArtworkPage(): Promise<{ pages: BookPage[]; newPageN
 export async function removeEmptyArtworkPage(
   pageId: string
 ): Promise<{ pages: BookPage[]; artworks: Artwork[] }> {
-  const { data: allPagesData, error: fetchError } = await supabase
+  const client = getClient();
+  const { data: allPagesData, error: fetchError } = await client
     .from('book_pages')
     .select('*')
     .order('page_number', { ascending: true });
@@ -360,7 +375,7 @@ export async function removeEmptyArtworkPage(
     throw new Error('At least one artwork page must remain in the book.');
   }
 
-  const { error: deleteError } = await supabase.from('book_pages').delete().eq('id', pageId);
+  const { error: deleteError } = await client.from('book_pages').delete().eq('id', pageId);
   if (deleteError) {
     throw new Error(`Failed to remove page: ${deleteError.message}`);
   }
@@ -370,13 +385,13 @@ export async function removeEmptyArtworkPage(
     const expectedNum = i + 1;
     const p = remaining[i];
     if (p.page_number !== expectedNum) {
-      await supabase
+      await client
         .from('book_pages')
         .update({ page_number: expectedNum })
         .eq('id', p.id);
 
       if (p.artwork_id) {
-        await supabase
+        await client
           .from('artworks')
           .update({ page_number: expectedNum })
           .eq('id', p.artwork_id);
